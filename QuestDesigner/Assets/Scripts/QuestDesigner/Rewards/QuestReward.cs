@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuestReward {
+public class QuestReward : ScriptableObject {
 
 
 	public enum rewardType
@@ -14,8 +14,16 @@ public class QuestReward {
 
 	public int rewardID; //Is this necesary? (Thinking what to do with this...)
 	public rewardType type;
-	public GameObject target; //Temporary: Used for Item Rewards.
-	public int Quantities; //Temporary: Used for Exp and Coin rewards.
+
+
+
+	public rewardType getType(){
+		return type;
+	}
+
+	public int getID(){
+		return rewardID;
+	}
 
 
 }

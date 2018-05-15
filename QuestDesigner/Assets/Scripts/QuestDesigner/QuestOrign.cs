@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuestOrign {
+public class QuestOrign : ScriptableObject {
 
 	public enum originTypes
 	{

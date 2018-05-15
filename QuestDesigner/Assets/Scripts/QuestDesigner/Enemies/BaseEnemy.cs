@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuestObjective : MonoBehaviour {
+public class BaseEnemy : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
