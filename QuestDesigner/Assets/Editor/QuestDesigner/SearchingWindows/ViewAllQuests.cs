@@ -6,8 +6,7 @@ using System.IO;
 using System;
 using Object = UnityEngine.Object;
 
-
-public class ViewChainQuests : EditorWindow
+public class ViewAllQuests : EditorWindow
 {
     public GUIStyle myStyle;
     public GUIStyle style;
@@ -17,13 +16,13 @@ public class ViewChainQuests : EditorWindow
     private bool constantSearch = false;
     private bool _showFoldout;
     private string constantSearchText;
-    private Vector2 sp = Vector2.zero;
+    private  Vector2 sp= Vector2.zero;
 
 
-    [MenuItem("Quest Designer/Chain Quests/View Chain Quests")]
+    [MenuItem("Quest Designer/ViewAllQuests")]
     public static void OpenWindow()
     {
-        var w = GetWindow<ViewChainQuests>();
+        var w = GetWindow<ViewAllQuests>();
 
 
         w.style = new GUIStyle();
@@ -50,7 +49,7 @@ public class ViewChainQuests : EditorWindow
 
 
     }
-
+   
     private void QuestFinder()
     {
         EditorGUILayout.Space();
@@ -75,7 +74,7 @@ public class ViewChainQuests : EditorWindow
             if (constantSearch)
             {
                 constantSearch = false;
-                constantSearchText = "Constant Search";
+                constantSearchText="Constant Search";
             }
             else
             {
@@ -102,7 +101,7 @@ public class ViewChainQuests : EditorWindow
             {
                 paths[i] = AssetDatabase.GUIDToAssetPath(paths[i]);
                 AssetDatabase.GetMainAssetTypeAtPath(paths[i]);
-                if (AssetDatabase.GetMainAssetTypeAtPath(paths[i]) == typeof(ChainQuest))
+                if (AssetDatabase.GetMainAssetTypeAtPath(paths[i]) == typeof(SingleQuest) || AssetDatabase.GetMainAssetTypeAtPath(paths[i]) == typeof(ChainQuest))
                 {
                     var loaded = AssetDatabase.LoadAssetAtPath(paths[i], typeof(Object));
                     assetList.Add(loaded);
@@ -125,7 +124,7 @@ public class ViewChainQuests : EditorWindow
             {
                 paths[i] = AssetDatabase.GUIDToAssetPath(paths[i]);
 
-                if (AssetDatabase.GetMainAssetTypeAtPath(paths[i]) == typeof(ChainQuest))
+                if (AssetDatabase.GetMainAssetTypeAtPath(paths[i]) == typeof(SingleQuest) || AssetDatabase.GetMainAssetTypeAtPath(paths[i]) == typeof(ChainQuest))
                 {
                     var loaded = AssetDatabase.LoadAssetAtPath(paths[i], typeof(Object));
                     assetList.Add(loaded);
@@ -148,7 +147,7 @@ public class ViewChainQuests : EditorWindow
             EditorGUILayout.LabelField(assetList[i].ToString());
             if (GUILayout.Button("Seleccionar"))
             {
-                SubWindow.OpenWindow(assetList[i]);
+                 SubWindow.OpenWindow(assetList[i]);
 
             }
             EditorGUILayout.EndHorizontal();
