@@ -6,10 +6,10 @@ public class QuestObjective : MonoBehaviour {
 
 	public enum objectiveTypes
 	{
-		ITEM = 2,
-		NPC = 3,
+		ITEM = 1,
+		NPC = 2,
 		ENEMY = 4,
-		LEVEL = 5
+		LEVEL = 8
 	}
 
 	public int objectivetID; //Is this necesary? (Thinking what to do with this...)

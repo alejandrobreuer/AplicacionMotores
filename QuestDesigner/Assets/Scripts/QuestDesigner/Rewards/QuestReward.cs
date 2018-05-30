@@ -7,8 +7,8 @@ public class QuestReward : ScriptableObject {
 
 	public enum rewardType
 	{
-		ITEM = 2,
-		EXP = 3,
+		ITEM = 1,
+		EXP = 2,
 		COINS = 4
 	}
 
