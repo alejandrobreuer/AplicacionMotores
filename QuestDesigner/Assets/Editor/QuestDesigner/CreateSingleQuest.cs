@@ -14,6 +14,13 @@ public class CreateSingleQuest : EditorWindow {
 	private List<QuestObjective> objectives;
 	private List<QuestReward> rewards;
 
+	private static QuestRequirement.requirementsType reqs = 0;
+	private static QuestObjective.objectiveTypes obje = 0;
+	private static QuestReward.rewardType rewa = 0;
+
+	public  SingleQuest singleQuest;
+
+
 
 	[MenuItem("Quest Designer/Single Quests/Create Single Quest")]
 	public static void OpenWindow() 
@@ -25,7 +32,10 @@ public class CreateSingleQuest : EditorWindow {
 
 	private void OnGUI()
 	{
-		ToShow ();
+		if (singleQuest == null)
+			ToShow ();
+		else
+			EditQuest ();
 	}
 
 	private void ToShow()  // Cambiar este nombre despues, solo temporal.
@@ -51,19 +61,71 @@ public class CreateSingleQuest : EditorWindow {
 	
 		questID = EditorGUILayout.IntField ("Quest ID:", questID);
 		EditorGUILayout.Space();
+
 		name = EditorGUILayout.TextField ("Quest name:", name);
 		EditorGUILayout.Space();
+
+		reqs = (QuestRequirement.requirementsType)EditorGUILayout.EnumFlagsField ("Requirements:",reqs);
+		EditorGUILayout.Space();
+
+		obje = (QuestObjective.objectiveTypes)EditorGUILayout.EnumFlagsField ("Objectives:",obje);
+		EditorGUILayout.Space();
+
+		rewa = (QuestReward.rewardType)EditorGUILayout.EnumFlagsField ("Rewards:",rewa);
+		EditorGUILayout.Space();
+
 		description = EditorGUILayout.TextField ("Description:", description);
 		EditorGUILayout.Space();
+
 		questOrigin = (QuestOrign)EditorGUILayout.ObjectField ("Quest origin:",questOrigin, typeof(QuestOrign),true);
 		EditorGUILayout.Space();
 
-		/*var req = ScriptableObject.CreateInstance<QuestRequirement>();
-		SerializedObject serializedRequirement = new UnityEditor.SerializedObject (req);
-		SerializedProperty serializedPropertyMyRequirements = serializedRequirement.FindProperty ("requirements");
+		if (GUILayout.Button("Save"))
+		{
+			var singleQuests = new SingleQuest ();
 
-		req = EditorGUILayout.PropertyField (serializedPropertyMyRequirements,req);*/
+			singleQuests.name = name;
+			singleQuests.description = description;
+			singleQuests.originator = questOrigin;
+		}
 
 
+	}
+
+	void EditQuest()
+	{
+		GUIStyle titleStyle = new GUIStyle ();
+		titleStyle.alignment = TextAnchor.UpperCenter;
+		titleStyle.fontSize = 24;
+
+
+		for (int i = 0; i < 2; i++) {
+
+			EditorGUILayout.Space();
+		}
+
+		EditorGUILayout.LabelField("Single quest creator", titleStyle);
+
+		for (int i = 0; i < 3; i++) {
+
+			EditorGUILayout.Space();
+		}
+		//_toPreview = (GameObject)EditorGUILayout.ObjectField("Mostrar: ", _toPreview, typeof(GameObject), true);
+
+		questID = EditorGUILayout.IntField ("Quest ID:", singleQuest.questID);
+		EditorGUILayout.Space();
+		name = EditorGUILayout.TextField ("Quest name:", singleQuest.name);
+		EditorGUILayout.Space();
+		description = EditorGUILayout.TextField ("Description:", singleQuest.description);
+		EditorGUILayout.Space();
+		questOrigin = (QuestOrign)EditorGUILayout.ObjectField ("Quest origin:",singleQuest.originator, typeof(QuestOrign),true);
+		EditorGUILayout.Space();
+
+		if (GUILayout.Button("Save Changes"))
+		{
+			singleQuest.name = name;
+			singleQuest.description = description;
+			singleQuest.originator = questOrigin;
+		}	
 	}
 }

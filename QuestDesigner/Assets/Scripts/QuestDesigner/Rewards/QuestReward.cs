@@ -7,9 +7,9 @@ public class QuestReward : ScriptableObject {
 
 	public enum rewardType
 	{
-		ITEM,
-		EXP,
-		COINS
+		ITEM = 2,
+		EXP = 3,
+		COINS = 4
 	}
 
 	public int rewardID; //Is this necesary? (Thinking what to do with this...)
