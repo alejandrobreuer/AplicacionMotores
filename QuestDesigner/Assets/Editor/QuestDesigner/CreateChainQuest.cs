@@ -19,6 +19,7 @@ public class CreateChainQuest : EditorWindow
     private float toolbarHeight = 115;
     private Color color;
     private ViewAllQuests questFinder;
+    private CreateSingleQuest singleQuestEditor;
 
     private NodeQuest selectedNode;
     private NodeQuest startNode;
@@ -37,29 +38,6 @@ public class CreateChainQuest : EditorWindow
     {
         var myQuestWindow = GetWindow<CreateChainQuest>();
         myQuestWindow.StartFunctions(myQuestWindow);
-        /*if (myQuestWindow.chain != null)
-        {
-            Debug.Log("funca");
-            myQuestWindow.name = myQuestWindow.chain.name;
-        }
-        else
-        {
-            myQuestWindow.name = "Chain Quest Editor";
-            myQuestWindow.allNodes = new List<NodeQuest>();
-        }
-        myQuestWindow.allNodes = new List<NodeQuest>();
-        myQuestWindow.windowStyle = new GUIStyle();
-        myQuestWindow.windowStyle.fontSize = 15;
-        myQuestWindow.windowStyle.alignment = TextAnchor.MiddleCenter;
-        myQuestWindow.windowStyle.fontStyle = FontStyle.Italic;
-        myQuestWindow.windowStyle.normal.textColor = Color.white;
-        myQuestWindow.color = GUI.backgroundColor;
-
-        myQuestWindow.graphPan = new Vector2(0, myQuestWindow.toolbarHeight);
-        myQuestWindow.graphRect = new Rect(0, myQuestWindow.toolbarHeight, 1000000, 1000000);
-
-        myQuestWindow.nodeTextFieldStyle = new GUIStyle(EditorStyles.textField);
-        myQuestWindow.nodeTextFieldStyle.wordWrap = true;*/
     }
     public void StartFunctions(CreateChainQuest myQuestWindow)
     {
@@ -137,7 +115,6 @@ public class CreateChainQuest : EditorWindow
                 RemoveLine();
                 allNodes.RemoveAt(i);
             }
-            allNodes = new List<NodeQuest>();
         }
         if (GUILayout.Button("Save", GUILayout.Width(40), GUILayout.Height(15)))
         {
@@ -275,6 +252,7 @@ public class CreateChainQuest : EditorWindow
         GenericMenu menu = new GenericMenu();
         menu.AddItem(new GUIContent("Connect Node"), false, DrawLine);
         menu.AddItem(new GUIContent("Remove Conections"), false, RemoveLine);
+        menu.AddItem(new GUIContent("Edit"), false, OpenSingleQuestEditor);
         menu.AddItem(new GUIContent("Delete"), false, Delete);
         menu.ShowAsContext();
     }
@@ -309,5 +287,15 @@ public class CreateChainQuest : EditorWindow
                 return;
             }
         }
+    }
+    private void OpenSingleQuestEditor()
+    {
+        if (singleQuestEditor == null)
+        {
+            singleQuestEditor = (CreateSingleQuest)ScriptableObject.CreateInstance(typeof(CreateSingleQuest));
+            singleQuestEditor.wantsMouseMove = true;
+            singleQuestEditor.Show();
+        }
+        else singleQuestEditor.Close();
     }
 }
