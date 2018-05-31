@@ -20,7 +20,7 @@ public class ViewSignleQuests : EditorWindow
     private Vector2 sp = Vector2.zero;
 
 
-    [MenuItem("Quest Designer/Single Quests/View Single Quests")]
+    //[MenuItem("Quest Designer/Single Quests/View Single Quests")]
     public static void OpenWindow()
     {
         var w = GetWindow<ViewSignleQuests>();

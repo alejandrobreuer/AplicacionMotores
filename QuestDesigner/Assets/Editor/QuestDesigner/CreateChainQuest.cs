@@ -18,7 +18,7 @@ public class CreateChainQuest : EditorWindow
     private string currentName;
     private float toolbarHeight = 115;
     private Color color;
-    private ViewSignleQuests questFinder;
+    private ViewAllQuests questFinder;
 
     private NodeQuest selectedNode;
     private NodeQuest startNode;
@@ -36,7 +36,8 @@ public class CreateChainQuest : EditorWindow
     public static void OpenWindow()
     {
         var myQuestWindow = GetWindow<CreateChainQuest>();
-        if (myQuestWindow.chain != null)
+        myQuestWindow.StartFunctions(myQuestWindow);
+        /*if (myQuestWindow.chain != null)
         {
             Debug.Log("funca");
             myQuestWindow.name = myQuestWindow.chain.name;
@@ -58,7 +59,33 @@ public class CreateChainQuest : EditorWindow
         myQuestWindow.graphRect = new Rect(0, myQuestWindow.toolbarHeight, 1000000, 1000000);
 
         myQuestWindow.nodeTextFieldStyle = new GUIStyle(EditorStyles.textField);
+        myQuestWindow.nodeTextFieldStyle.wordWrap = true;*/
+    }
+    public void StartFunctions(CreateChainQuest myQuestWindow)
+    {
+        if (myQuestWindow.chain != null)
+        {
+            myQuestWindow.name = myQuestWindow.chain.myname;
+        }
+        else
+        {
+            myQuestWindow.name = "Chain Quest Editor";
+            myQuestWindow.allNodes = new List<NodeQuest>();
+        }
+        myQuestWindow.allNodes = new List<NodeQuest>();
+        myQuestWindow.windowStyle = new GUIStyle();
+        myQuestWindow.windowStyle.fontSize = 15;
+        myQuestWindow.windowStyle.alignment = TextAnchor.MiddleCenter;
+        myQuestWindow.windowStyle.fontStyle = FontStyle.Italic;
+        myQuestWindow.windowStyle.normal.textColor = Color.white;
+        myQuestWindow.color = GUI.backgroundColor;
+
+        myQuestWindow.graphPan = new Vector2(0, myQuestWindow.toolbarHeight);
+        myQuestWindow.graphRect = new Rect(0, myQuestWindow.toolbarHeight, 1000000, 1000000);
+
+        myQuestWindow.nodeTextFieldStyle = new GUIStyle(EditorStyles.textField);
         myQuestWindow.nodeTextFieldStyle.wordWrap = true;
+        myQuestWindow.Show();
     }
 
     private void OnGUI()
@@ -82,8 +109,12 @@ public class CreateChainQuest : EditorWindow
         {
             if (questFinder == null)
             {
-                questFinder = (ViewSignleQuests)EditorWindow.GetWindow(typeof(ViewSignleQuests));
-                ViewSignleQuests.OpenWindow();
+                questFinder = (ViewAllQuests)ScriptableObject.CreateInstance(typeof(ViewAllQuests));
+                //questFinder = (ViewAllQuests)EditorWindow.GetWindow(typeof(ViewAllQuests));
+                questFinder.addQuest = true;
+                questFinder.wantsMouseMove = true;
+                questFinder.StartFunctions(questFinder);
+                //ViewAllQuests.OpenWindow();
             }
             else questFinder.Close();
         }

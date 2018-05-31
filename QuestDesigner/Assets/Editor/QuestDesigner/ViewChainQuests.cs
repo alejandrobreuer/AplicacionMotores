@@ -20,7 +20,7 @@ public class ViewChainQuests : EditorWindow
     private Vector2 sp = Vector2.zero;
 
 
-    [MenuItem("Quest Designer/Chain Quests/View Chain Quests")]
+    //[MenuItem("Quest Designer/Chain Quests/View Chain Quests")]
     public static void OpenWindow()
     {
         var w = GetWindow<ViewChainQuests>();

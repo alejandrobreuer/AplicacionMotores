@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//[CreateAssetMenu(fileName = "New Chain Quest", menuName = "Chain Quest")]
+[CreateAssetMenu(fileName = "New Chain Quest", menuName = "Chain Quest")]
 public class ChainQuest: ScriptableObject
 {
 	public int chainQuestID;
