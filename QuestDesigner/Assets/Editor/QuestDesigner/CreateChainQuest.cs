@@ -7,12 +7,18 @@ using System;
 [ExecuteInEditMode]
 public class CreateChainQuest : EditorWindow
 {
-    public CreateChainQuest chain;
+
+    //Variable para que me pacen el chainquest
+    public ChainQuest chain;
+
+
     private List<NodeQuest> allNodes;
     private GUIStyle windowStyle;
+    private string chainname;
     private string currentName;
-    private float toolbarHeight = 90;
+    private float toolbarHeight = 115;
     private Color color;
+    private ViewSignleQuests questFinder;
 
     private NodeQuest selectedNode;
     private NodeQuest startNode;
@@ -33,9 +39,11 @@ public class CreateChainQuest : EditorWindow
         if (myQuestWindow.chain != null)
         {
             Debug.Log("funca");
+            myQuestWindow.name = myQuestWindow.chain.name;
         }
         else
         {
+            myQuestWindow.name = "Chain Quest Editor";
             myQuestWindow.allNodes = new List<NodeQuest>();
         }
         myQuestWindow.allNodes = new List<NodeQuest>();
@@ -58,37 +66,53 @@ public class CreateChainQuest : EditorWindow
         CheckMouseInput(Event.current);
 
         EditorGUI.DrawRect(new Rect(0, 0, position.width, 40), Color.black);
-        EditorGUILayout.LabelField("CHAIN QUEST EDITOR", windowStyle, GUILayout.Height(40));
+        EditorGUILayout.LabelField(name, windowStyle, GUILayout.Height(40));
         EditorGUILayout.Space();
-        EditorGUILayout.BeginHorizontal();
         currentName = EditorGUILayout.TextField("Quest Name: ", currentName);
-        EditorGUILayout.Space();
+        EditorGUILayout.BeginHorizontal();
         if (Event.current.keyCode == KeyCode.Return && currentName != null)
         {
             AddNode();
         }
-        if (GUILayout.Button("Create New Quest", GUILayout.Width(150), GUILayout.Height(15)) && currentName != null)
+        if (GUILayout.Button("Create New Quest", GUILayout.Width(140), GUILayout.Height(15)) && currentName != null)
         {
             AddNode();
         }
-        if (GUILayout.Button("Find Quest", GUILayout.Width(100), GUILayout.Height(15)) && currentName != null)
+        if (GUILayout.Button("Find Quest", GUILayout.Width(100), GUILayout.Height(15)))
         {
-
+            if (questFinder == null)
+            {
+                questFinder = (ViewSignleQuests)EditorWindow.GetWindow(typeof(ViewSignleQuests));
+                ViewSignleQuests.OpenWindow();
+            }
+            else questFinder.Close();
         }
         EditorGUILayout.EndHorizontal();
-        EditorGUI.DrawRect(new Rect(0, 87, position.width, 5), Color.black);
-        EditorGUI.DrawRect(new Rect(0, 40, 3, 50), Color.black);
-        EditorGUI.DrawRect(new Rect(position.width - 3, 40, 3, 50), Color.black);
+        EditorGUI.DrawRect(new Rect(0, 112, position.width, 5), Color.black);
+        EditorGUI.DrawRect(new Rect(0, 40, 3, 80), Color.black);
+        EditorGUI.DrawRect(new Rect(position.width - 3, 40, 3, 80), Color.black);
         EditorGUI.DrawRect(new Rect(0, toolbarHeight, position.width, position.height - toolbarHeight), Color.gray);
 
         if (Event.current.keyCode == KeyCode.Delete && selectedNode != null && startNode == null)
         {
             Delete();
         }
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Clean", GUILayout.Width(60), GUILayout.Height(15)))
+        {
+            for (int i = 0; i < allNodes.Count; i = 0)
+            {
+                selectedNode = allNodes[i];
+                RemoveLine();
+                allNodes.RemoveAt(i);
+            }
+            allNodes = new List<NodeQuest>();
+        }
         if (GUILayout.Button("Save", GUILayout.Width(40), GUILayout.Height(15)))
         {
 
         }
+        EditorGUILayout.EndHorizontal();
         GUI.BeginGroup(graphRect);
         BeginWindows();
 
@@ -104,7 +128,7 @@ public class CreateChainQuest : EditorWindow
             else if (allNodes[i] == startNode)
                 GUI.backgroundColor = Color.blue;
 
-            allNodes[i].myRect = GUI.Window(i, allNodes[i].myRect, DrawNode, allNodes[i].nodeName);
+            allNodes[i].myRect = GUI.Window(i, allNodes[i].myRect, DrawNode, allNodes[i].name);
             GUI.backgroundColor = color;
         }
         EndWindows();
@@ -113,7 +137,7 @@ public class CreateChainQuest : EditorWindow
 
     private void AddNode()
     {
-        allNodes.Add(new NodeQuest(0, 0, 200, 70, currentName));
+        allNodes.Add(new NodeQuest(0, 0, 200, 80, currentName));
         currentName = null;
         Repaint();
     }
@@ -126,7 +150,7 @@ public class CreateChainQuest : EditorWindow
             startNode = null;
             return;
         }
-        //panning
+        /*//panning
         if (currentE.button == 2 && currentE.type == EventType.MouseDown)
         {
             _panningScreen = true;
@@ -145,7 +169,7 @@ public class CreateChainQuest : EditorWindow
             graphPan.y = newY > toolbarHeight ? toolbarHeight : newY;
 
             Repaint();
-        }
+        }*/
 
 
         //node selection
@@ -199,7 +223,9 @@ public class CreateChainQuest : EditorWindow
     }
     private void DrawNode(int id)
     {
-        allNodes[id].ID = EditorGUILayout.FloatField("ID", allNodes[id].ID);
+        allNodes[id].questID = EditorGUILayout.IntField("ID", allNodes[id].questID);
+        allNodes[id].name = EditorGUILayout.TextField("Name", allNodes[id].name);
+        allNodes[id].description = EditorGUILayout.TextField("Quest Name: ", allNodes[id].description);
         if (!_panningScreen)
         {
             GUI.DragWindow();
@@ -227,7 +253,6 @@ public class CreateChainQuest : EditorWindow
     }
     private void RemoveLine()
     {
-        Debug.Log("Conection deleted: " + selectedNode.connected.Count);
         for (int i = 0; i < selectedNode.connected.Count; i = 0)
         {
             var select = selectedNode.connected[i];

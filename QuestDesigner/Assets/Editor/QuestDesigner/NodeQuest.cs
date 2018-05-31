@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NodeQuest
+public class NodeQuest 
 {
+    public int questID;
+    public new string name;
+    public string description;
     public Rect myRect;
-    public string nodeName;
-    public float ID;
+
     private bool _overNode;
     public List<NodeQuest> connected;
 
@@ -15,7 +17,7 @@ public class NodeQuest
     {
         myRect = new Rect(x, y, width, height);
         connected = new List<NodeQuest>();
-        nodeName = name;
+        this.name = name;
     }
 
     public void CheckMouse(Event cE, Vector2 pan)
