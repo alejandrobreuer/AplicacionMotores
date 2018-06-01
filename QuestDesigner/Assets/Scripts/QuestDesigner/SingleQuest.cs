@@ -16,9 +16,9 @@ public class SingleQuest : ScriptableObject {
 
 	//Estas listas de arriba lo mas probable es que las use pero todavia no se si son nececarias.
 
-	private  QuestRequirement.requirementsType reqs = 0;
-	private  QuestObjective.objectiveTypes obje = 0;
-	private  QuestReward.rewardType rewa = 0;
+	public  QuestRequirement.requirementsType reqs = 0;
+	public  QuestObjective.objectiveTypes obje = 0;
+	public  QuestReward.rewardType rewa = 0;
 
 
 

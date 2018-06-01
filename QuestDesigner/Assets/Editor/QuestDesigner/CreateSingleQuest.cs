@@ -121,13 +121,13 @@ public class CreateSingleQuest : EditorWindow {
 		name = EditorGUILayout.TextField ("Quest name:", singleQuest.name);
 		EditorGUILayout.Space();
 
-		reqs = (QuestRequirement.requirementsType)EditorGUILayout.EnumFlagsField ("Requirements:",singleQuests.reqs);
+		reqs = (QuestRequirement.requirementsType)EditorGUILayout.EnumFlagsField ("Requirements:",singleQuest.reqs);
 		EditorGUILayout.Space();
 
-		obje = (QuestObjective.objectiveTypes)EditorGUILayout.EnumFlagsField ("Objectives:",singleQuests.obje);
+		obje = (QuestObjective.objectiveTypes)EditorGUILayout.EnumFlagsField ("Objectives:",singleQuest.obje);
 		EditorGUILayout.Space();
 
-		rewa = (QuestReward.rewardType)EditorGUILayout.EnumFlagsField ("Rewards:",singleQuests.rewa);
+		rewa = (QuestReward.rewardType)EditorGUILayout.EnumFlagsField ("Rewards:",singleQuest.rewa);
 		EditorGUILayout.Space();
 
 		description = EditorGUILayout.TextField ("Description:", singleQuest.description);
@@ -141,9 +141,9 @@ public class CreateSingleQuest : EditorWindow {
 			singleQuest.name = name;
 			singleQuest.description = description;
 			singleQuest.originator = questOrigin;
-			singleQuests.rewa = rewa;
-			singleQuests.obje = obje;
-			singleQuests.reqs = reqs;
+			singleQuest.rewa = rewa;
+			singleQuest.obje = obje;
+			singleQuest.reqs = reqs;
 		}	
 	}
 }
