@@ -14,6 +14,12 @@ public class SingleQuest : ScriptableObject {
 	public List<QuestObjective> objectives;
 	public List<QuestReward> rewards;
 
+	//Estas listas de arriba lo mas probable es que las use pero todavia no se si son nececarias.
+
+	private  QuestRequirement.requirementsType reqs = 0;
+	private  QuestObjective.objectiveTypes obje = 0;
+	private  QuestReward.rewardType rewa = 0;
+
 
 
 }

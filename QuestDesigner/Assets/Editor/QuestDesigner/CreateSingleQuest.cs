@@ -14,9 +14,9 @@ public class CreateSingleQuest : EditorWindow {
 	private List<QuestObjective> objectives;
 	private List<QuestReward> rewards;
 
-	private static QuestRequirement.requirementsType reqs = 0;
-	private static QuestObjective.objectiveTypes obje = 0;
-	private static QuestReward.rewardType rewa = 0;
+	private  QuestRequirement.requirementsType reqs = 0;
+	private  QuestObjective.objectiveTypes obje = 0;
+	private  QuestReward.rewardType rewa = 0;
 
 	public  SingleQuest singleQuest;
 
@@ -87,6 +87,9 @@ public class CreateSingleQuest : EditorWindow {
 			singleQuests.name = name;
 			singleQuests.description = description;
 			singleQuests.originator = questOrigin;
+			singleQuests.rewa = rewa;
+			singleQuests.obje = obje;
+			singleQuests.reqs = reqs;
 		}
 
 
@@ -114,10 +117,22 @@ public class CreateSingleQuest : EditorWindow {
 
 		questID = EditorGUILayout.IntField ("Quest ID:", singleQuest.questID);
 		EditorGUILayout.Space();
+
 		name = EditorGUILayout.TextField ("Quest name:", singleQuest.name);
 		EditorGUILayout.Space();
+
+		reqs = (QuestRequirement.requirementsType)EditorGUILayout.EnumFlagsField ("Requirements:",singleQuests.reqs);
+		EditorGUILayout.Space();
+
+		obje = (QuestObjective.objectiveTypes)EditorGUILayout.EnumFlagsField ("Objectives:",singleQuests.obje);
+		EditorGUILayout.Space();
+
+		rewa = (QuestReward.rewardType)EditorGUILayout.EnumFlagsField ("Rewards:",singleQuests.rewa);
+		EditorGUILayout.Space();
+
 		description = EditorGUILayout.TextField ("Description:", singleQuest.description);
 		EditorGUILayout.Space();
+
 		questOrigin = (QuestOrign)EditorGUILayout.ObjectField ("Quest origin:",singleQuest.originator, typeof(QuestOrign),true);
 		EditorGUILayout.Space();
 
@@ -126,6 +141,9 @@ public class CreateSingleQuest : EditorWindow {
 			singleQuest.name = name;
 			singleQuest.description = description;
 			singleQuest.originator = questOrigin;
+			singleQuests.rewa = rewa;
+			singleQuests.obje = obje;
+			singleQuests.reqs = reqs;
 		}	
 	}
 }
