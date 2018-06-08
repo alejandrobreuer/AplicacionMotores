@@ -13,4 +13,10 @@ public class ChainQuest: ScriptableObject
     //public List<> chainQuestList;
 	public List<QuestReward> rewards;
 
+
+	public static void SaveChainQuest(ChainQuest q){
+		q.chainQuestID = q.GetInstanceID();
+		QuestSaveManager.CreateAsset<ChainQuest> ();
+
+	}
 }

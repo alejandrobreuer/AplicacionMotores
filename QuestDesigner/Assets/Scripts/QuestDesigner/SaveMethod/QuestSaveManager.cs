@@ -6,11 +6,13 @@ using UnityEditor;
 
 public class QuestSaveManager : MonoBehaviour {
 
+	public static int SINGLEID = 1;
+	public static int CHAINID = 1;
 
 	public static void CreateAsset<T>() where T : ScriptableObject{
 
-		T asset = ScriptableObject.CreateInstance<T> ();
 
+		T asset = ScriptableObject.CreateInstance<T> ();
 		string path = AssetDatabase.GetAssetPath (Selection.activeObject);
 		if (path == "") {
 			path = "Assets";
@@ -28,8 +30,7 @@ public class QuestSaveManager : MonoBehaviour {
 		Selection.activeObject = asset;
 
 
-
 	}
-
+		
 
 }
