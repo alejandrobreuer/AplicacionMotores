@@ -10,13 +10,9 @@ public class ChainQuest: ScriptableObject
     public string description;
 	public QuestOrign originator;
 	public List<QuestRequirement> requirements;
-    //public List<> chainQuestList;
+    public List<SingleQuest> chainQuestList;
 	public List<QuestReward> rewards;
+    public List<Rect> mySingleQuestRects = new List<Rect>();
+    public List<SingleQuest> quests = new List<SingleQuest>();
 
-
-	public static void SaveChainQuest(ChainQuest q){
-		q.chainQuestID = q.GetInstanceID();
-		QuestSaveManager.CreateAsset<ChainQuest> ();
-
-	}
 }

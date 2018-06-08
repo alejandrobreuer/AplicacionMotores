@@ -20,6 +20,7 @@ public class ViewAllQuests : EditorWindow
     private CreateSingleQuest wEditSingle;
     private CreateChainQuest wEditChain;
     public bool addQuest = false;
+    public CreateChainQuest createChainQuest;
     public static int sa;
     public static QuestRequirement.requirementsType op;
 
@@ -298,11 +299,12 @@ public class ViewAllQuests : EditorWindow
 
                 }
             }
-            if (addQuest)
+            if (addQuest && AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GetAssetPath(assetList[i])) == typeof(SingleQuest))
             {
             if (GUILayout.Button("Add"))
             {
-                return;
+                    var singleQuest = (SingleQuest)AssetDatabase.LoadAssetAtPath(AssetDatabase.GetAssetPath(assetList[i]), typeof(SingleQuest));
+                    createChainQuest.AddFoundNode(singleQuest);
             }
 
             }

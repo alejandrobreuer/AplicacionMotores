@@ -6,7 +6,7 @@ using UnityEngine;
 public class NodeQuest 
 {
     public int questID;
-    public new string name;
+    public string name;
     public string description;
     public Rect myRect;
 

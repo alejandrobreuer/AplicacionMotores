@@ -44,13 +44,38 @@ public class CreateChainQuest : EditorWindow
         if (myQuestWindow.chain != null)
         {
             myQuestWindow.name = myQuestWindow.chain.myname;
+            myQuestWindow.allNodes = new List<NodeQuest>();
+            for (int i = 0; i < myQuestWindow.chain.quests.Count; i++)
+            {
+                myQuestWindow.allNodes.Add(new NodeQuest(myQuestWindow.chain.mySingleQuestRects[i].x, myQuestWindow.chain.mySingleQuestRects[i].y, myQuestWindow.chain.mySingleQuestRects[i].width, myQuestWindow.chain.mySingleQuestRects[i].height, myQuestWindow.chain.name));
+                var a = myQuestWindow.allNodes[i];
+                a.questID = myQuestWindow.chain.quests[i].questID;
+                a.name = myQuestWindow.chain.quests[i].name;
+                a.description = myQuestWindow.chain.quests[i].description;
+                myQuestWindow.allNodes[i] = a;
+            }
+            for (int i = 0; i < myQuestWindow.allNodes.Count; i++)
+            {
+                var a = myQuestWindow.chain.quests[i].conectedQuests;
+                for (int j = 0; j < a.Count; j++)
+                {
+                    var b = a[j];
+                    for (int y = 0; y < myQuestWindow.allNodes.Count; y++)
+                    {
+                        if (b == myQuestWindow.allNodes[y].questID)
+                        {
+                            allNodes[i].connected.Add(allNodes[y]);
+                        }
+                    }
+                }
+            }
+            Repaint();
         }
         else
         {
             myQuestWindow.name = "Chain Quest Editor";
             myQuestWindow.allNodes = new List<NodeQuest>();
         }
-        myQuestWindow.allNodes = new List<NodeQuest>();
         myQuestWindow.windowStyle = new GUIStyle();
         myQuestWindow.windowStyle.fontSize = 15;
         myQuestWindow.windowStyle.alignment = TextAnchor.MiddleCenter;
@@ -91,6 +116,7 @@ public class CreateChainQuest : EditorWindow
                 //questFinder = (ViewAllQuests)EditorWindow.GetWindow(typeof(ViewAllQuests));
                 questFinder.addQuest = true;
                 questFinder.wantsMouseMove = true;
+                questFinder.createChainQuest = this;
                 questFinder.StartFunctions(questFinder);
                 //ViewAllQuests.OpenWindow();
             }
@@ -118,7 +144,7 @@ public class CreateChainQuest : EditorWindow
         }
         if (GUILayout.Button("Save", GUILayout.Width(40), GUILayout.Height(15)))
         {
-
+            save();
         }
         EditorGUILayout.EndHorizontal();
         GUI.BeginGroup(graphRect);
@@ -142,7 +168,17 @@ public class CreateChainQuest : EditorWindow
         EndWindows();
         GUI.EndGroup();
     }
-
+    public void AddFoundNode(SingleQuest s)
+    {
+        allNodes.Add(new NodeQuest(0, 0, 200, 80, s.name));
+        var a = allNodes[allNodes.Count - 1];
+        a.questID = s.questID;
+        a.name = s.name;
+        a.description = s.description;
+        allNodes[allNodes.Count - 1] = a;
+        Repaint();
+        Debug.Log("ada");
+    }
     private void AddNode()
     {
         allNodes.Add(new NodeQuest(0, 0, 200, 80, currentName));
@@ -247,6 +283,31 @@ public class CreateChainQuest : EditorWindow
                 allNodes[id].myRect.y = toolbarHeight - graphPan.y;
         }
     }
+    private void save()
+    {
+        if (chain == null)
+        {
+            ScriptableObjectUtility.CreateAsset<ChainQuest>("Chain_1");
+            chain = (ChainQuest)AssetDatabase.LoadAssetAtPath("Assets/" + "Chain_1" + ".asset", typeof(object));
+        }
+        chain.quests = new List<SingleQuest>();
+        chain.mySingleQuestRects = new List<Rect>();
+        for (int i = 0; i < allNodes.Count; i++)
+        {
+            chain.mySingleQuestRects.Add(allNodes[i].myRect);
+            ScriptableObjectUtility.CreateAsset<SingleQuest>(allNodes[i].questID.ToString());
+            var a = (SingleQuest)AssetDatabase.LoadAssetAtPath("Assets/" + allNodes[i].questID.ToString() + ".asset", typeof(object));
+            a.description = allNodes[i].description;
+            a.questID = allNodes[i].questID;
+            a.name = allNodes[i].name;
+            chain.quests.Add(a);
+            chain.quests[i].conectedQuests = new List<int>();
+            for (int j = 0; j < allNodes[i].connected.Count; j++)
+            {
+                chain.quests[i].conectedQuests.Add(allNodes[i].connected[j].questID);
+            }
+        }
+    }
     private void Options()
     {
         GenericMenu menu = new GenericMenu();
@@ -254,8 +315,26 @@ public class CreateChainQuest : EditorWindow
         menu.AddItem(new GUIContent("Remove Conections"), false, RemoveLine);
         menu.AddItem(new GUIContent("Edit"), false, OpenSingleQuestEditor);
         menu.AddItem(new GUIContent("Delete"), false, Delete);
+        menu.AddItem(new GUIContent("Destroy"), false, DestroyFromUnity);
         menu.ShowAsContext();
     }
+
+    private void DestroyFromUnity()
+    {
+        RemoveLine();
+        for (int i = 0; i < allNodes.Count; i++)
+        {
+            if (allNodes[i].Equals(selectedNode))
+            {
+                allNodes.RemoveAt(i);
+                continue;
+            }
+        }
+        AssetDatabase.DeleteAsset("Assets/" + selectedNode.questID.ToString() + ".asset");
+        selectedNode = null;
+        save();
+    }
+
     private void DrawLine()
     {
         startNode = selectedNode;
@@ -294,8 +373,11 @@ public class CreateChainQuest : EditorWindow
         {
             singleQuestEditor = (CreateSingleQuest)ScriptableObject.CreateInstance(typeof(CreateSingleQuest));
             singleQuestEditor.wantsMouseMove = true;
+            singleQuestEditor.singleQuest = (SingleQuest)AssetDatabase.LoadAssetAtPath("Assets/" + selectedNode.questID + ".asset", typeof(object));
+            singleQuestEditor.node = selectedNode;
+            singleQuestEditor.chain = this;
             singleQuestEditor.Show();
+            selectedNode = null;
         }
-        else singleQuestEditor.Close();
     }
 }

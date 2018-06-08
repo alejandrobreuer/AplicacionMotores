@@ -18,14 +18,16 @@ public class CreateSingleQuest : EditorWindow {
 	private  QuestObjective.objectiveTypes obje = 0;
 	private  QuestReward.rewardType rewa = 0;
 
-	public  SingleQuest singleQuest;
+	public SingleQuest singleQuest;
+    public NodeQuest node;
+    public CreateChainQuest chain;
 
 
 
 	[MenuItem("Quest Designer/Single Quests/Create Single Quest")]
 	public static void OpenWindow() 
 	{
-		CreateSingleQuest window = (CreateSingleQuest)GetWindow (typeof(CreateSingleQuest)); // Referencia a la ventana.
+        CreateSingleQuest window = GetWindow<CreateSingleQuest>(); // Referencia a la ventana.
 		window.wantsMouseMove = true; 
 		window.Show();
 	}
@@ -115,22 +117,22 @@ public class CreateSingleQuest : EditorWindow {
 		}
 		//_toPreview = (GameObject)EditorGUILayout.ObjectField("Mostrar: ", _toPreview, typeof(GameObject), true);
 
-		questID = EditorGUILayout.IntField ("Quest ID:", singleQuest.questID);
+		questID = EditorGUILayout.IntField ("Quest ID:", questID);
 		EditorGUILayout.Space();
 
-		name = EditorGUILayout.TextField ("Quest name:", singleQuest.name);
+		name = EditorGUILayout.TextField ("Quest name:", name);
 		EditorGUILayout.Space();
 
-		reqs = (QuestRequirement.requirementsType)EditorGUILayout.EnumFlagsField ("Requirements:",singleQuest.reqs);
+		reqs = (QuestRequirement.requirementsType)EditorGUILayout.EnumFlagsField ("Requirements:", reqs);
 		EditorGUILayout.Space();
 
-		obje = (QuestObjective.objectiveTypes)EditorGUILayout.EnumFlagsField ("Objectives:",singleQuest.obje);
+		obje = (QuestObjective.objectiveTypes)EditorGUILayout.EnumFlagsField ("Objectives:", obje);
 		EditorGUILayout.Space();
 
-		rewa = (QuestReward.rewardType)EditorGUILayout.EnumFlagsField ("Rewards:",singleQuest.rewa);
+		rewa = (QuestReward.rewardType)EditorGUILayout.EnumFlagsField ("Rewards:", rewa);
 		EditorGUILayout.Space();
 
-		description = EditorGUILayout.TextField ("Description:", singleQuest.description);
+		description = EditorGUILayout.TextField ("Description:", description);
 		EditorGUILayout.Space();
 
 		questOrigin = (QuestOrign)EditorGUILayout.ObjectField ("Quest origin:",singleQuest.originator, typeof(QuestOrign),true);
@@ -144,6 +146,12 @@ public class CreateSingleQuest : EditorWindow {
 			singleQuest.rewa = rewa;
 			singleQuest.obje = obje;
 			singleQuest.reqs = reqs;
+            //node
+            node.name = singleQuest.name;
+            node.description = description;
+            node.questID = questID;
+            chain.Repaint();
+            this.Close();
 		}	
 	}
 }
