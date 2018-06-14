@@ -8,7 +8,8 @@ public class CreateSingleQuest : EditorWindow {
 
 
 	private int questID;
-	private string name, description;
+    private new string name;
+    private string description;
 	private QuestOrign questOrigin;
 	private QuestRequirement requirements;
 	private List<QuestObjective> objectives;
@@ -61,8 +62,6 @@ public class CreateSingleQuest : EditorWindow {
 		}
 		//_toPreview = (GameObject)EditorGUILayout.ObjectField("Mostrar: ", _toPreview, typeof(GameObject), true);
 	
-		questID = EditorGUILayout.IntField ("Quest ID:", questID);
-		EditorGUILayout.Space();
 
 		name = EditorGUILayout.TextField ("Quest name:", name);
 		EditorGUILayout.Space();
@@ -117,8 +116,6 @@ public class CreateSingleQuest : EditorWindow {
 		}
 		//_toPreview = (GameObject)EditorGUILayout.ObjectField("Mostrar: ", _toPreview, typeof(GameObject), true);
 
-		questID = EditorGUILayout.IntField ("Quest ID:", questID);
-		EditorGUILayout.Space();
 
 		name = EditorGUILayout.TextField ("Quest name:", name);
 		EditorGUILayout.Space();
@@ -149,7 +146,6 @@ public class CreateSingleQuest : EditorWindow {
             //node
             node.name = singleQuest.name;
             node.description = description;
-            node.questID = questID;
             chain.Repaint();
             this.Close();
 		}	

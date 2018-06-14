@@ -30,6 +30,7 @@ public class CreateChainQuest : EditorWindow
     private Vector2 _originalMousePosition;
     private Vector2 prevPan;
     private Rect graphRect;
+    private QuestSaveManager saveManger;
 
     public GUIStyle nodeTextFieldStyle;
 
@@ -56,15 +57,17 @@ public class CreateChainQuest : EditorWindow
             }
             for (int i = 0; i < myQuestWindow.allNodes.Count; i++)
             {
-                var a = myQuestWindow.chain.quests[i].conectedQuests;
-                for (int j = 0; j < a.Count; j++)
+                if (myQuestWindow.chain.conectedQuests.ContainsKey(myQuestWindow.allNodes[i].questID))
                 {
-                    var b = a[j];
-                    for (int y = 0; y < myQuestWindow.allNodes.Count; y++)
+                    List<int> a = myQuestWindow.chain.conectedQuests[myQuestWindow.allNodes[i].questID];
+                    for (int j = 0; j < a.Count; j++)
                     {
-                        if (b == myQuestWindow.allNodes[y].questID)
+                        for (int y = 0; y < myQuestWindow.allNodes.Count; y++)
                         {
-                            allNodes[i].connected.Add(allNodes[y]);
+                            if(myQuestWindow.allNodes[y].questID == a[j])
+                            {
+                                myQuestWindow.allNodes[i].connected.Add(myQuestWindow.allNodes[y]);
+                            }
                         }
                     }
                 }
@@ -89,6 +92,11 @@ public class CreateChainQuest : EditorWindow
         myQuestWindow.nodeTextFieldStyle = new GUIStyle(EditorStyles.textField);
         myQuestWindow.nodeTextFieldStyle.wordWrap = true;
         myQuestWindow.Show();
+        if ((QuestSaveManager)AssetDatabase.LoadAssetAtPath("Assets/" + "SaveManager" + ".asset", typeof(object)) == null)
+        {
+            ScriptableObjectUtility.CreateAsset<QuestSaveManager>("SaveManager");
+        }
+        saveManger = (QuestSaveManager)AssetDatabase.LoadAssetAtPath("Assets/" + "SaveManager" + ".asset", typeof(object));
     }
 
     private void OnGUI()
@@ -170,18 +178,33 @@ public class CreateChainQuest : EditorWindow
     }
     public void AddFoundNode(SingleQuest s)
     {
-        allNodes.Add(new NodeQuest(0, 0, 200, 80, s.name));
-        var a = allNodes[allNodes.Count - 1];
-        a.questID = s.questID;
-        a.name = s.name;
-        a.description = s.description;
-        allNodes[allNodes.Count - 1] = a;
-        Repaint();
-        Debug.Log("ada");
+        bool exist = false;
+        for (int i = 0; i < allNodes.Count; i++)
+        {
+            if (s.questID == allNodes[i].questID)
+            {
+                exist = true;
+            }
+        }
+        if (!exist)
+        {
+            allNodes.Add(new NodeQuest(0, 0, 150, 40, s.name));
+            var a = allNodes[allNodes.Count - 1];
+            a.name = s.name;
+            a.description = s.description;
+            allNodes[allNodes.Count - 1] = a;
+            Repaint();
+        }
+        else
+        {
+            Debug.Log("Already Exist");
+        }
     }
     private void AddNode()
     {
-        allNodes.Add(new NodeQuest(0, 0, 200, 80, currentName));
+        allNodes.Add(new NodeQuest(0, 0, 150, 40, currentName));
+        saveManger.SINGLEID++;
+        allNodes[allNodes.Count - 1].questID = saveManger.SINGLEID;
         currentName = null;
         Repaint();
     }
@@ -267,9 +290,6 @@ public class CreateChainQuest : EditorWindow
     }
     private void DrawNode(int id)
     {
-        allNodes[id].questID = EditorGUILayout.IntField("ID", allNodes[id].questID);
-        allNodes[id].name = EditorGUILayout.TextField("Name", allNodes[id].name);
-        allNodes[id].description = EditorGUILayout.TextField("Quest Name: ", allNodes[id].description);
         if (!_panningScreen)
         {
             GUI.DragWindow();
@@ -287,8 +307,10 @@ public class CreateChainQuest : EditorWindow
     {
         if (chain == null)
         {
-            ScriptableObjectUtility.CreateAsset<ChainQuest>("Chain_1");
-            chain = (ChainQuest)AssetDatabase.LoadAssetAtPath("Assets/" + "Chain_1" + ".asset", typeof(object));
+            saveManger.CHAINID++;
+            var a = saveManger.CHAINID;
+            ScriptableObjectUtility.CreateAsset<ChainQuest>("Chain_" + a);
+            chain = (ChainQuest)AssetDatabase.LoadAssetAtPath("Assets/" + "Chain_" + a + ".asset", typeof(object));
         }
         chain.quests = new List<SingleQuest>();
         chain.mySingleQuestRects = new List<Rect>();
@@ -301,10 +323,15 @@ public class CreateChainQuest : EditorWindow
             a.questID = allNodes[i].questID;
             a.name = allNodes[i].name;
             chain.quests.Add(a);
-            chain.quests[i].conectedQuests = new List<int>();
-            for (int j = 0; j < allNodes[i].connected.Count; j++)
+            chain.conectedQuests = new Dictionary<int, List<int>>();
+            for (int j = 0; j < allNodes.Count; j++)
             {
-                chain.quests[i].conectedQuests.Add(allNodes[i].connected[j].questID);
+                var b = new List<int>();
+                for (int y = 0; y < allNodes[j].connected.Count; y++)
+                {
+                    b.Add(allNodes[j].connected[y].questID);
+                }
+                chain.conectedQuests[allNodes[j].questID] = b;
             }
         }
     }

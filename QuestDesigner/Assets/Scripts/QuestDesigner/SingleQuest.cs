@@ -13,7 +13,6 @@ public class SingleQuest : ScriptableObject {
 	public List<QuestRequirement> requirements;
 	public List<QuestObjective> objectives;
 	public List<QuestReward> rewards;
-    public List<int> conectedQuests = new List<int>();
 
 	//Estas listas de arriba lo mas probable es que las use pero todavia no se si son nececarias.
 
