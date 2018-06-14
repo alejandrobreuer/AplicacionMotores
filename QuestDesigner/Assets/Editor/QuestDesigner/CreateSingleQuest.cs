@@ -20,6 +20,8 @@ public class CreateSingleQuest : EditorWindow {
 	private  QuestReward.rewardType rewa = 0;
 
 	public SingleQuest singleQuest;
+
+	public QuestSaveManager saveManager;
     public NodeQuest node;
     public CreateChainQuest chain;
 
@@ -29,7 +31,8 @@ public class CreateSingleQuest : EditorWindow {
 	public static void OpenWindow() 
 	{
         CreateSingleQuest window = GetWindow<CreateSingleQuest>(); // Referencia a la ventana.
-		window.wantsMouseMove = true; 
+		window.wantsMouseMove = true;
+		window.minSize = new Vector2(600,300);
 		window.Show();
 	}
 
@@ -47,7 +50,14 @@ public class CreateSingleQuest : EditorWindow {
 		GUIStyle titleStyle = new GUIStyle ();
 		titleStyle.alignment = TextAnchor.UpperCenter;
 		titleStyle.fontSize = 24;
+	
 
+		if ((QuestSaveManager)AssetDatabase.LoadAssetAtPath("Assets/" + "SaveManager" + ".asset", typeof(object)) == null)
+        {
+            ScriptableObjectUtility.CreateAsset<QuestSaveManager>("SaveManager");
+        }
+
+        saveManager = (QuestSaveManager)AssetDatabase.LoadAssetAtPath("Assets/" + "SaveManager" + ".asset", typeof(object));
 
 		for (int i = 0; i < 2; i++) {
 			
@@ -83,17 +93,33 @@ public class CreateSingleQuest : EditorWindow {
 
 		if (GUILayout.Button("Save"))
 		{
-			var singleQuests = new SingleQuest ();
+			if(name != null)
+			{
+				if(AssetDatabase.LoadAssetAtPath("Assets/" + name + ".asset", typeof(object)) == null)
+				{	
+					saveManager.SINGLEID++;
+					SingleQuest singleQuests = ScriptableObject.CreateInstance<SingleQuest>();
 
-			singleQuests.name = name;
-			singleQuests.description = description;
-			singleQuests.originator = questOrigin;
-			singleQuests.rewa = rewa;
-			singleQuests.obje = obje;
-			singleQuests.reqs = reqs;
+					singleQuests.name = name;
+					singleQuests.description = description;
+					singleQuests.originator = questOrigin;
+					singleQuests.rewa = rewa;
+					singleQuests.obje = obje;
+					singleQuests.reqs = reqs;
+
+					string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath("Assets/" + singleQuests.name + ".asset");
+					AssetDatabase.CreateAsset(singleQuests, assetPathAndName);
+				
+				}
+			
+				Close();
+			}
+			
+
 		}
 
-
+		if(name == null)
+			EditorGUILayout.HelpBox("You must fill the name field", MessageType.Warning);
 	}
 
 	void EditQuest()

@@ -17,6 +17,7 @@ public static class ScriptableObjectUtility
 
             //Creamos el asset
             AssetDatabase.CreateAsset(asset, assetPathAndName);
+            
         }
 
         //AssetDatabase.SaveAssets();

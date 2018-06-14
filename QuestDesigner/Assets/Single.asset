@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Name: Single
   m_EditorClassIdentifier: 
   questID: 0
-  name: Single
-  description: Simplest Quest
+  name: 
+  description: 
   originator: {fileID: 0}
   requirements: []
   objectives: []
   rewards: []
+  reqs: 0
+  obje: 0
+  rewa: 0
