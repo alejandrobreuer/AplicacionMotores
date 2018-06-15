@@ -24,11 +24,14 @@ public class ViewAllQuests : EditorWindow
     public static int sa;
     public static QuestRequirement.requirementsType op;
 
+    private List<int> allQuestId = new List<int>();
+
 
     [MenuItem("Quest Designer/ViewAllQuests")]
     public static void OpenWindow()
     {
         var w = GetWindow<ViewAllQuests>();
+        w.minSize = new Vector2(600,300);
         w.StartFunctions(w);
 
     }
@@ -48,6 +51,15 @@ public class ViewAllQuests : EditorWindow
         w.constantSearchText = "Constant Search";
 
         w.assetList = new List<Object>();
+
+        if (createChainQuest!= null)
+        {
+            for (int i = 0; i < createChainQuest.allNodes.Count; i++)
+            {
+                allQuestId.Add(createChainQuest.allNodes[i].questID);
+            }
+        }
+
         w.Show();
 
     }
@@ -301,16 +313,26 @@ public class ViewAllQuests : EditorWindow
             }
             if (addQuest && AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GetAssetPath(assetList[i])) == typeof(SingleQuest))
             {
-            if (GUILayout.Button("Add"))
-            {
-                    var singleQuest = (SingleQuest)AssetDatabase.LoadAssetAtPath(AssetDatabase.GetAssetPath(assetList[i]), typeof(SingleQuest));
-                    createChainQuest.AddFoundNode(singleQuest);
-            }
+                var singleQuest = (SingleQuest)AssetDatabase.LoadAssetAtPath(AssetDatabase.GetAssetPath(assetList[i]), typeof(SingleQuest));
+                if (!allQuestId.Contains(singleQuest.questID))
 
+                {
+                    if (GUILayout.Button("Add"))
+                    {
+                        allQuestId = createChainQuest.AddFoundNode(singleQuest);
+                        Repaint();
+                    }
+                }
             }
             EditorGUILayout.EndHorizontal();
         }
         EditorGUILayout.EndScrollView();
 
+    }
+
+    public void RemoveQuestId(int id)
+    {
+        allQuestId.Remove(id);
+        Repaint();
     }
 }

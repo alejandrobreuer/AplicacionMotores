@@ -9,15 +9,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de93179ae829e014bab41b39978ef49a, type: 3}
-  m_Name: Single
+  m_Name: 1
   m_EditorClassIdentifier: 
   questID: 0
   name: 
   description: 
   originator: {fileID: 0}
-  requirements: []
-  objectives: []
-  rewards: []
   reqs: 0
   obje: 0
   rewa: 0

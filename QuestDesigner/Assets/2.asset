@@ -8,12 +8,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c200072de2a271e489a8c1b14baddae8, type: 3}
-  m_Name: Chain
+  m_Script: {fileID: 11500000, guid: de93179ae829e014bab41b39978ef49a, type: 3}
+  m_Name: 2
   m_EditorClassIdentifier: 
-  chainQuestID: 1
-  myname: ChainQ
-  description: Best Cemplicated Quest
+  questID: 0
+  name: 
+  description: 
   originator: {fileID: 0}
-  requirements: []
-  rewards: []
+  reqs: 0
+  obje: 0
+  rewa: 0

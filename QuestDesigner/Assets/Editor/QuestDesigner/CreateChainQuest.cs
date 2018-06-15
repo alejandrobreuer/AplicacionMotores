@@ -12,7 +12,7 @@ public class CreateChainQuest : EditorWindow
     public ChainQuest chain;
 
 
-    private List<NodeQuest> allNodes;
+    public List<NodeQuest> allNodes;
     private GUIStyle windowStyle;
     private string chainname;
     private string currentName;
@@ -176,29 +176,21 @@ public class CreateChainQuest : EditorWindow
         EndWindows();
         GUI.EndGroup();
     }
-    public void AddFoundNode(SingleQuest s)
+    public List<int> AddFoundNode(SingleQuest s)
     {
-        bool exist = false;
+        allNodes.Add(new NodeQuest(0, 0, 150, 40, s.name));
+        var a = allNodes[allNodes.Count - 1];
+        a.name = s.name;
+        a.description = s.description;
+        a.questID = s.questID;
+        allNodes[allNodes.Count - 1] = a;
+        var b = new List<int>();
         for (int i = 0; i < allNodes.Count; i++)
         {
-            if (s.questID == allNodes[i].questID)
-            {
-                exist = true;
-            }
+            b.Add(allNodes[i].questID);
         }
-        if (!exist)
-        {
-            allNodes.Add(new NodeQuest(0, 0, 150, 40, s.name));
-            var a = allNodes[allNodes.Count - 1];
-            a.name = s.name;
-            a.description = s.description;
-            allNodes[allNodes.Count - 1] = a;
-            Repaint();
-        }
-        else
-        {
-            Debug.Log("Already Exist");
-        }
+        Repaint();
+        return b;
     }
     private void AddNode()
     {
@@ -388,11 +380,17 @@ public class CreateChainQuest : EditorWindow
         {
             if (allNodes[i].Equals(selectedNode))
             {
+                if(questFinder != null)
+                {
+                    questFinder.RemoveQuestId(selectedNode.questID);
+                }
                 selectedNode = null;
                 allNodes.RemoveAt(i);
+                Repaint();
                 return;
             }
         }
+        Repaint();
     }
     private void OpenSingleQuestEditor()
     {

@@ -20,9 +20,9 @@ public static class ScriptableObjectUtility
             
         }
 
-        //AssetDatabase.SaveAssets();
+        AssetDatabase.SaveAssets();
 
-        //AssetDatabase.Refresh();
+        AssetDatabase.Refresh();
 
     }
 }
