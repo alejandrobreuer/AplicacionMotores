@@ -16,10 +16,12 @@ public class CreateChainQuest : EditorWindow
     private GUIStyle windowStyle;
     private string chainname;
     private string currentName;
-    private float toolbarHeight = 115;
+    private float toolbarHeight = 125;
     private Color color;
     private ViewAllQuests questFinder;
     private CreateSingleQuest singleQuestEditor;
+    private string prevName;
+    private List<string> prevNameQuests;
 
     private NodeQuest selectedNode;
     private NodeQuest startNode;
@@ -44,6 +46,7 @@ public class CreateChainQuest : EditorWindow
     {
         if (myQuestWindow.chain != null)
         {
+            myQuestWindow.prevName = chain.myname;
             myQuestWindow.name = myQuestWindow.chain.myname;
             myQuestWindow.allNodes = new List<NodeQuest>();
             for (int i = 0; i < myQuestWindow.chain.quests.Count; i++)
@@ -57,17 +60,22 @@ public class CreateChainQuest : EditorWindow
             }
             for (int i = 0; i < myQuestWindow.allNodes.Count; i++)
             {
-                if (myQuestWindow.chain.conectedQuests.ContainsKey(myQuestWindow.allNodes[i].questID))
+                int indx = 0;
+                for (int c = 0; c < myQuestWindow.chain.connectedQuestsId.Count; c++)
                 {
-                    List<int> a = myQuestWindow.chain.conectedQuests[myQuestWindow.allNodes[i].questID];
-                    for (int j = 0; j < a.Count; j++)
+                    if (myQuestWindow.chain.connectedQuestsId[c] == myQuestWindow.allNodes[i].questID)
                     {
-                        for (int y = 0; y < myQuestWindow.allNodes.Count; y++)
+                        indx = c;
+                    }
+                }
+                List<int> a = myQuestWindow.chain.connectedQuests[indx];
+                for (int j = 0; j < a.Count; j++)
+                {
+                    for (int y = 0; y < myQuestWindow.allNodes.Count; y++)
+                    {
+                        if (myQuestWindow.allNodes[y].questID == a[j])
                         {
-                            if(myQuestWindow.allNodes[y].questID == a[j])
-                            {
-                                myQuestWindow.allNodes[i].connected.Add(myQuestWindow.allNodes[y]);
-                            }
+                            myQuestWindow.allNodes[i].connected.Add(myQuestWindow.allNodes[y]);
                         }
                     }
                 }
@@ -77,6 +85,7 @@ public class CreateChainQuest : EditorWindow
         else
         {
             myQuestWindow.name = "Chain Quest Editor";
+            myQuestWindow.prevName = myQuestWindow.name;
             myQuestWindow.allNodes = new List<NodeQuest>();
         }
         myQuestWindow.windowStyle = new GUIStyle();
@@ -92,21 +101,22 @@ public class CreateChainQuest : EditorWindow
         myQuestWindow.nodeTextFieldStyle = new GUIStyle(EditorStyles.textField);
         myQuestWindow.nodeTextFieldStyle.wordWrap = true;
         myQuestWindow.Show();
-        if ((QuestSaveManager)AssetDatabase.LoadAssetAtPath("Assets/" + "SaveManager" + ".asset", typeof(object)) == null)
+        if ((QuestSaveManager)AssetDatabase.LoadAssetAtPath("Assets/Quests/Save/" + "SaveManager" + ".asset", typeof(object)) == null)
         {
-            ScriptableObjectUtility.CreateAsset<QuestSaveManager>("SaveManager");
+            ScriptableObjectUtility.CreateAsset<QuestSaveManager>("Save", "SaveManager");
         }
-        saveManger = (QuestSaveManager)AssetDatabase.LoadAssetAtPath("Assets/" + "SaveManager" + ".asset", typeof(object));
+        saveManger = (QuestSaveManager)AssetDatabase.LoadAssetAtPath("Assets/Quests/Save/" + "SaveManager" + ".asset", typeof(object));
     }
 
     private void OnGUI()
     {
         CheckMouseInput(Event.current);
 
-        EditorGUI.DrawRect(new Rect(0, 0, position.width, 40), Color.black);
+        EditorGUI.DrawRect(new Rect(0, 0, position.width, 45), Color.black);
         EditorGUILayout.LabelField(name, windowStyle, GUILayout.Height(40));
         EditorGUILayout.Space();
-        currentName = EditorGUILayout.TextField("Quest Name: ", currentName);
+        name = EditorGUILayout.TextField("Chain Name: ", name);
+        currentName = EditorGUILayout.TextField("Single Quest Name: ", currentName);
         EditorGUILayout.BeginHorizontal();
         if (Event.current.keyCode == KeyCode.Return && currentName != null)
         {
@@ -131,9 +141,9 @@ public class CreateChainQuest : EditorWindow
             else questFinder.Close();
         }
         EditorGUILayout.EndHorizontal();
-        EditorGUI.DrawRect(new Rect(0, 112, position.width, 5), Color.black);
-        EditorGUI.DrawRect(new Rect(0, 40, 3, 80), Color.black);
-        EditorGUI.DrawRect(new Rect(position.width - 3, 40, 3, 80), Color.black);
+        EditorGUI.DrawRect(new Rect(0, 122, position.width, 5), Color.black);
+        EditorGUI.DrawRect(new Rect(0, 45, 3, 80), Color.black);
+        EditorGUI.DrawRect(new Rect(position.width - 3, 45, 3, 80), Color.black);
         EditorGUI.DrawRect(new Rect(0, toolbarHeight, position.width, position.height - toolbarHeight), Color.gray);
 
         if (Event.current.keyCode == KeyCode.Delete && selectedNode != null && startNode == null)
@@ -195,8 +205,8 @@ public class CreateChainQuest : EditorWindow
     private void AddNode()
     {
         allNodes.Add(new NodeQuest(0, 0, 150, 40, currentName));
-        saveManger.SINGLEID++;
         allNodes[allNodes.Count - 1].questID = saveManger.SINGLEID;
+        saveManger.SINGLEID++;
         currentName = null;
         Repaint();
     }
@@ -299,23 +309,34 @@ public class CreateChainQuest : EditorWindow
     {
         if (chain == null)
         {
-            saveManger.CHAINID++;
             var a = saveManger.CHAINID;
-            ScriptableObjectUtility.CreateAsset<ChainQuest>("Chain_" + a);
-            chain = (ChainQuest)AssetDatabase.LoadAssetAtPath("Assets/" + "Chain_" + a + ".asset", typeof(object));
+            ScriptableObjectUtility.CreateAsset<ChainQuest>("Chain", name + "_" + a);
+            chain = (ChainQuest)AssetDatabase.LoadAssetAtPath("Assets/Quests/Chain/" + name + "_" + a + ".asset", typeof(object));
+            chain.chainQuestID = a;
+            chain.myname = name;
+            prevName = name;
+            saveManger.CHAINID++;
+        }
+        else if(name != prevName)
+        {
+            var a = chain.chainQuestID;
+            AssetDatabase.RenameAsset("Assets/Quests/Chain/" + prevName + "_" + a + ".asset", name + "_" + a);
+            chain.myname = name;
+            prevName = name;
         }
         chain.quests = new List<SingleQuest>();
         chain.mySingleQuestRects = new List<Rect>();
         for (int i = 0; i < allNodes.Count; i++)
         {
             chain.mySingleQuestRects.Add(allNodes[i].myRect);
-            ScriptableObjectUtility.CreateAsset<SingleQuest>(allNodes[i].questID.ToString());
-            var a = (SingleQuest)AssetDatabase.LoadAssetAtPath("Assets/" + allNodes[i].questID.ToString() + ".asset", typeof(object));
+            ScriptableObjectUtility.CreateAsset<SingleQuest>("Single", allNodes[i].name + "_" + allNodes[i].questID.ToString());
+            var a = (SingleQuest)AssetDatabase.LoadAssetAtPath("Assets/Quests/Single/" + allNodes[i].name + "_" + allNodes[i].questID.ToString() + ".asset", typeof(object));
             a.description = allNodes[i].description;
             a.questID = allNodes[i].questID;
             a.name = allNodes[i].name;
             chain.quests.Add(a);
-            chain.conectedQuests = new Dictionary<int, List<int>>();
+            chain.connectedQuestsId = new List<int>();
+            chain.connectedQuests = new List<List<int>>();
             for (int j = 0; j < allNodes.Count; j++)
             {
                 var b = new List<int>();
@@ -323,7 +344,8 @@ public class CreateChainQuest : EditorWindow
                 {
                     b.Add(allNodes[j].connected[y].questID);
                 }
-                chain.conectedQuests[allNodes[j].questID] = b;
+                chain.connectedQuestsId.Add(allNodes[j].questID);
+                chain.connectedQuests.Add(b);
             }
         }
     }
@@ -349,7 +371,10 @@ public class CreateChainQuest : EditorWindow
                 continue;
             }
         }
-        AssetDatabase.DeleteAsset("Assets/" + selectedNode.questID.ToString() + ".asset");
+        if ((SingleQuest)AssetDatabase.LoadAssetAtPath("Assets/Quests/Single/" + selectedNode.name + "_" + selectedNode.questID.ToString() + ".asset", typeof(object)) != null)
+        {
+            AssetDatabase.DeleteAsset("Assets/Quests/Single/" + selectedNode.name + "_" + selectedNode.questID.ToString() + ".asset");
+        }
         selectedNode = null;
         save();
     }
@@ -371,6 +396,7 @@ public class CreateChainQuest : EditorWindow
                 }
             }
             selectedNode.connected.RemoveAt(i);
+            //
         }
     }
     private void Delete()
@@ -398,10 +424,10 @@ public class CreateChainQuest : EditorWindow
         {
             singleQuestEditor = (CreateSingleQuest)ScriptableObject.CreateInstance(typeof(CreateSingleQuest));
             singleQuestEditor.wantsMouseMove = true;
-            singleQuestEditor.singleQuest = (SingleQuest)AssetDatabase.LoadAssetAtPath("Assets/" + selectedNode.questID + ".asset", typeof(object));
+            singleQuestEditor.singleQuest = (SingleQuest)AssetDatabase.LoadAssetAtPath("Assets/Quests/Single/" + selectedNode.name + "_" + selectedNode.questID + ".asset", typeof(object));
             singleQuestEditor.node = selectedNode;
             singleQuestEditor.chain = this;
-            singleQuestEditor.Show();
+            singleQuestEditor.Open();
             selectedNode = null;
         }
     }

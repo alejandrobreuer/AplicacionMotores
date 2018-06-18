@@ -14,5 +14,7 @@ public class ChainQuest : ScriptableObject
     //public List<QuestReward> rewards;
     public List<Rect> mySingleQuestRects = new List<Rect>();
     public List<SingleQuest> quests = new List<SingleQuest>();
-    public Dictionary<int, List<int>> conectedQuests = new Dictionary<int, List<int>>();
+
+    public List<int> connectedQuestsId = new List<int>();
+    public List<List<int>> connectedQuests = new List<List<int>>();
 }

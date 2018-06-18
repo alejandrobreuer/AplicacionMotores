@@ -146,11 +146,12 @@ public class ViewAllQuests : EditorWindow
         if (GUILayout.Button("Search"))
         {
             assetList.Clear();
-            string[] paths = AssetDatabase.FindAssets(_SearchName);
+            string[] paths = AssetDatabase.FindAssets(_SearchName, new string[] { "Assets/Quests" });
 
 
             for (int i = 0; i < paths.Length; i++)
             {
+
                 paths[i] = AssetDatabase.GUIDToAssetPath(paths[i]);
                 AssetDatabase.GetMainAssetTypeAtPath(paths[i]);
                 if (AssetDatabase.GetMainAssetTypeAtPath(paths[i]) == typeof(SingleQuest) || AssetDatabase.GetMainAssetTypeAtPath(paths[i]) == typeof(ChainQuest))
@@ -169,7 +170,8 @@ public class ViewAllQuests : EditorWindow
         if (aux != _SearchName && constantSearch)
         {
             assetList.Clear();
-            string[] paths = AssetDatabase.FindAssets(_SearchName);
+            string[] paths = AssetDatabase.FindAssets(_SearchName, new string[] { "Assets/Quests" });
+
 
 
             for (int i = 0; i < paths.Length; i++)
@@ -233,7 +235,8 @@ public class ViewAllQuests : EditorWindow
         if (GUILayout.Button("Search"))
         {
             assetList.Clear();
-            string[] paths = AssetDatabase.FindAssets(_SearchName);
+            string[] paths = AssetDatabase.FindAssets(_SearchName, new string[] { "Assets/Quests" });
+
 
 
             for (int i = 0; i < paths.Length; i++)
@@ -256,7 +259,8 @@ public class ViewAllQuests : EditorWindow
         if (aux != _SearchName && constantSearch)
         {
             assetList.Clear();
-            string[] paths = AssetDatabase.FindAssets(_SearchName);
+            string[] paths = AssetDatabase.FindAssets(_SearchName, new string[] { "Assets/Quests" });
+
 
 
             for (int i = 0; i < paths.Length; i++)
@@ -298,7 +302,8 @@ public class ViewAllQuests : EditorWindow
                     wEditSingle =(CreateSingleQuest)EditorWindow.GetWindow(typeof(CreateSingleQuest));
                     wEditSingle.wantsMouseMove = true;
                     wEditSingle.singleQuest = (SingleQuest)AssetDatabase.LoadAssetAtPath(AssetDatabase.GetAssetPath(assetList[i]), typeof(SingleQuest));
-                    wEditSingle.Show();
+      
+                    wEditSingle.Open();
 
                 }
                 else if (AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GetAssetPath(assetList[i])) == typeof(ChainQuest))
