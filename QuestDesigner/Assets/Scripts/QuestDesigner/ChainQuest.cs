@@ -16,5 +16,5 @@ public class ChainQuest : ScriptableObject
     public List<SingleQuest> quests = new List<SingleQuest>();
 
     public List<int> connectedQuestsId = new List<int>();
-    public List<List<int>> connectedQuests = new List<List<int>>();
+    public List<string> serialicedConectedQuest = new List<string>();
 }

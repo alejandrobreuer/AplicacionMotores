@@ -27,12 +27,12 @@ public class CreateChainQuest : EditorWindow
     private NodeQuest startNode;
 
     //para el paneo
-    private bool _panningScreen;
     private Vector2 graphPan;
     private Vector2 _originalMousePosition;
     private Vector2 prevPan;
     private Rect graphRect;
     private QuestSaveManager saveManger;
+    private bool needsave;
 
     public GUIStyle nodeTextFieldStyle;
 
@@ -68,7 +68,15 @@ public class CreateChainQuest : EditorWindow
                         indx = c;
                     }
                 }
-                List<int> a = myQuestWindow.chain.connectedQuests[indx];
+                List<int> aux = new List<int>();
+                string rest = myQuestWindow.chain.serialicedConectedQuest[indx];
+                for (int j = 0; j < rest.Length; j = 0)
+                {
+                    var str = rest.Remove(myQuestWindow.chain.serialicedConectedQuest[indx].IndexOf("_"));
+                    aux.Add(System.Convert.ToInt32(str));
+                    rest = rest.Substring(rest.IndexOf("_") + 1);
+                }
+                List<int> a = aux;
                 for (int j = 0; j < a.Count; j++)
                 {
                     for (int y = 0; y < myQuestWindow.allNodes.Count; y++)
@@ -79,6 +87,7 @@ public class CreateChainQuest : EditorWindow
                         }
                     }
                 }
+                //
             }
             Repaint();
         }
@@ -88,6 +97,7 @@ public class CreateChainQuest : EditorWindow
             myQuestWindow.prevName = myQuestWindow.name;
             myQuestWindow.allNodes = new List<NodeQuest>();
         }
+        myQuestWindow.needsave = false;
         myQuestWindow.windowStyle = new GUIStyle();
         myQuestWindow.windowStyle.fontSize = 15;
         myQuestWindow.windowStyle.alignment = TextAnchor.MiddleCenter;
@@ -110,6 +120,10 @@ public class CreateChainQuest : EditorWindow
 
     private void OnGUI()
     {
+        if(singleQuestEditor != null)
+        {
+            selectedNode = null;
+        }
         CheckMouseInput(Event.current);
 
         EditorGUI.DrawRect(new Rect(0, 0, position.width, 45), Color.black);
@@ -118,11 +132,11 @@ public class CreateChainQuest : EditorWindow
         name = EditorGUILayout.TextField("Chain Name: ", name);
         currentName = EditorGUILayout.TextField("Single Quest Name: ", currentName);
         EditorGUILayout.BeginHorizontal();
-        if (Event.current.keyCode == KeyCode.Return && currentName != null)
+        if (Event.current.keyCode == KeyCode.Return && currentName != "")
         {
             AddNode();
         }
-        if (GUILayout.Button("Create New Quest", GUILayout.Width(140), GUILayout.Height(15)) && currentName != null)
+        if (GUILayout.Button("Create New Quest", GUILayout.Width(140), GUILayout.Height(15)) && currentName != "")
         {
             AddNode();
         }
@@ -131,12 +145,10 @@ public class CreateChainQuest : EditorWindow
             if (questFinder == null)
             {
                 questFinder = (ViewAllQuests)ScriptableObject.CreateInstance(typeof(ViewAllQuests));
-                //questFinder = (ViewAllQuests)EditorWindow.GetWindow(typeof(ViewAllQuests));
                 questFinder.addQuest = true;
                 questFinder.wantsMouseMove = true;
                 questFinder.createChainQuest = this;
                 questFinder.StartFunctions(questFinder);
-                //ViewAllQuests.OpenWindow();
             }
             else questFinder.Close();
         }
@@ -155,15 +167,28 @@ public class CreateChainQuest : EditorWindow
         {
             for (int i = 0; i < allNodes.Count; i = 0)
             {
-                selectedNode = allNodes[i];
-                RemoveLine();
-                allNodes.RemoveAt(i);
+                selectedNode = allNodes[0];
+                Delete();
             }
+            return;
+        }
+        if(chain == null || needsave)
+        {
+            GUI.backgroundColor = Color.red;
+            Repaint();
+        }
+        else if ((ChainQuest)AssetDatabase.LoadAssetAtPath("Assets/Quests/Chain/" + name + "_" + chain.chainQuestID + ".asset", typeof(object)) == null || needsave)
+        {
+            GUI.backgroundColor = Color.red;
+            Repaint();
         }
         if (GUILayout.Button("Save", GUILayout.Width(40), GUILayout.Height(15)))
         {
             save();
+            needsave = false;
+            Repaint();
         }
+        GUI.backgroundColor = color;
         EditorGUILayout.EndHorizontal();
         GUI.BeginGroup(graphRect);
         BeginWindows();
@@ -179,12 +204,20 @@ public class CreateChainQuest : EditorWindow
                 GUI.backgroundColor = Color.yellow;
             else if (allNodes[i] == startNode)
                 GUI.backgroundColor = Color.blue;
-
+            if (AssetDatabase.LoadAssetAtPath("Assets/Quests/Single/" + allNodes[i].name + "_" + allNodes[i].questID.ToString() + ".asset", typeof(object)) == null)
+            {
+                if(startNode == null)
+                {
+                    GUI.backgroundColor = Color.red;
+                }
+                needsave = true;
+            }
             allNodes[i].myRect = GUI.Window(i, allNodes[i].myRect, DrawNode, allNodes[i].name);
             GUI.backgroundColor = color;
         }
         EndWindows();
         GUI.EndGroup();
+        Repaint();
     }
     public List<int> AddFoundNode(SingleQuest s)
     {
@@ -207,7 +240,7 @@ public class CreateChainQuest : EditorWindow
         allNodes.Add(new NodeQuest(0, 0, 150, 40, currentName));
         allNodes[allNodes.Count - 1].questID = saveManger.SINGLEID;
         saveManger.SINGLEID++;
-        currentName = null;
+        currentName = "";
         Repaint();
     }
 
@@ -219,27 +252,6 @@ public class CreateChainQuest : EditorWindow
             startNode = null;
             return;
         }
-        /*//panning
-        if (currentE.button == 2 && currentE.type == EventType.MouseDown)
-        {
-            _panningScreen = true;
-            prevPan = new Vector2(graphPan.x, graphPan.y);
-            _originalMousePosition = currentE.mousePosition;
-        }
-        else if (currentE.button == 2 && currentE.type == EventType.MouseUp)
-            _panningScreen = false;
-
-        if (_panningScreen)
-        {
-            var newX = prevPan.x + currentE.mousePosition.x - _originalMousePosition.x;
-            graphPan.x = newX > 0 ? 0 : newX;
-
-            var newY = prevPan.y + currentE.mousePosition.y - _originalMousePosition.y;
-            graphPan.y = newY > toolbarHeight ? toolbarHeight : newY;
-
-            Repaint();
-        }*/
-
 
         //node selection
         NodeQuest overNode = null;
@@ -263,6 +275,7 @@ public class CreateChainQuest : EditorWindow
                     {
                         startNode.connected.Add(selectedNode);
                         selectedNode.connected.Add(startNode);
+                        needsave = true;
                     }
                 }
                 else
@@ -292,20 +305,32 @@ public class CreateChainQuest : EditorWindow
     }
     private void DrawNode(int id)
     {
-        if (!_panningScreen)
+        GUILayout.BeginHorizontal();
+        GUI.backgroundColor = Color.green;
+        if(startNode == null && singleQuestEditor == null)
         {
-            GUI.DragWindow();
-
-            if (!allNodes[id].OverNode) return;
-
-            if (allNodes[id].myRect.x < 0)
-                allNodes[id].myRect.x = 0;
-
-            if (allNodes[id].myRect.y < toolbarHeight - graphPan.y)
-                allNodes[id].myRect.y = toolbarHeight - graphPan.y;
+            if (GUILayout.Button("Edit", GUILayout.Width(45), GUILayout.Height(15)))
+            {
+                OpenSingleQuestEditor();
+                Repaint();
+            }
+            if (GUILayout.Button("Connect", GUILayout.Width(60), GUILayout.Height(15)))
+            {
+                DrawLine();
+            }
         }
+        GUILayout.EndHorizontal();
+        GUI.DragWindow();
+
+        if (!allNodes[id].OverNode) return;
+
+        if (allNodes[id].myRect.x < 0)
+            allNodes[id].myRect.x = 0;
+
+        if (allNodes[id].myRect.y < toolbarHeight - graphPan.y)
+            allNodes[id].myRect.y = toolbarHeight - graphPan.y;
     }
-    private void save()
+    public void save()
     {
         if (chain == null)
         {
@@ -329,35 +354,41 @@ public class CreateChainQuest : EditorWindow
         for (int i = 0; i < allNodes.Count; i++)
         {
             chain.mySingleQuestRects.Add(allNodes[i].myRect);
-            ScriptableObjectUtility.CreateAsset<SingleQuest>("Single", allNodes[i].name + "_" + allNodes[i].questID.ToString());
+            if(AssetDatabase.LoadAssetAtPath("Assets/Quests/Single/" + allNodes[i].name + "_" + allNodes[i].questID.ToString() + ".asset", typeof(object)) == null)
+            {
+                ScriptableObjectUtility.CreateAsset<SingleQuest>("Single", allNodes[i].name + "_" + allNodes[i].questID.ToString());
+            }
             var a = (SingleQuest)AssetDatabase.LoadAssetAtPath("Assets/Quests/Single/" + allNodes[i].name + "_" + allNodes[i].questID.ToString() + ".asset", typeof(object));
             a.description = allNodes[i].description;
             a.questID = allNodes[i].questID;
             a.name = allNodes[i].name;
             chain.quests.Add(a);
             chain.connectedQuestsId = new List<int>();
-            chain.connectedQuests = new List<List<int>>();
+            chain.serialicedConectedQuest = new List<string>();
             for (int j = 0; j < allNodes.Count; j++)
             {
-                var b = new List<int>();
+                string c = "";
                 for (int y = 0; y < allNodes[j].connected.Count; y++)
                 {
-                    b.Add(allNodes[j].connected[y].questID);
+                    c += allNodes[j].connected[y].questID + "_";
                 }
+                chain.serialicedConectedQuest.Add(c);
                 chain.connectedQuestsId.Add(allNodes[j].questID);
-                chain.connectedQuests.Add(b);
             }
         }
     }
     private void Options()
     {
-        GenericMenu menu = new GenericMenu();
-        menu.AddItem(new GUIContent("Connect Node"), false, DrawLine);
-        menu.AddItem(new GUIContent("Remove Conections"), false, RemoveLine);
-        menu.AddItem(new GUIContent("Edit"), false, OpenSingleQuestEditor);
-        menu.AddItem(new GUIContent("Delete"), false, Delete);
-        menu.AddItem(new GUIContent("Destroy"), false, DestroyFromUnity);
-        menu.ShowAsContext();
+        if(singleQuestEditor == null)
+        {
+            GenericMenu menu = new GenericMenu();
+            menu.AddItem(new GUIContent("Connect Node"), false, DrawLine);
+            menu.AddItem(new GUIContent("Remove Conections"), false, RemoveLine);
+            menu.AddItem(new GUIContent("Edit"), false, OpenSingleQuestEditor);
+            menu.AddItem(new GUIContent("Delete"), false, Delete);
+            menu.AddItem(new GUIContent("Destroy"), false, DestroyFromUnity);
+            menu.ShowAsContext();
+        }
     }
 
     private void DestroyFromUnity()
@@ -393,6 +424,7 @@ public class CreateChainQuest : EditorWindow
                 if (select.connected[j].Equals(selectedNode))
                 {
                     select.connected.RemoveAt(j);
+                    needsave = true;
                 }
             }
             selectedNode.connected.RemoveAt(i);

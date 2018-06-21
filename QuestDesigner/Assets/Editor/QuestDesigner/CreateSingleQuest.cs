@@ -75,10 +75,6 @@ public class CreateSingleQuest : EditorWindow {
 		titleStyle.alignment = TextAnchor.UpperCenter;
 		titleStyle.fontSize = 24;
 	
-
-
-
-
 		for (int i = 0; i < 2; i++) {
 			
 			EditorGUILayout.Space();
@@ -147,15 +143,16 @@ public class CreateSingleQuest : EditorWindow {
             singleQuests.rewa = rewa;
             singleQuests.obje = obje;
             singleQuests.reqs = reqs;
-            saveManager.SINGLEID++;
 
             string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath("Assets/Quests/Single/" + singleQuests.name + "_" + singleQuests.questID + ".asset");
             AssetDatabase.CreateAsset(singleQuests, assetPathAndName);
+            saveManager.SINGLEID++;
 
             if (node != null)
             {
                 node.name = name;
                 node.description = description;
+                node.questID = singleQuests.questID;
                 chain.Repaint();
             }
             prevName = singleQuests.name;
@@ -179,6 +176,7 @@ public class CreateSingleQuest : EditorWindow {
                     node.description = description;
                     chain.Repaint();
                 }
+                Close();
             }
             else
             {
@@ -197,6 +195,7 @@ public class CreateSingleQuest : EditorWindow {
                     chain.Repaint();
                 }
                 prevName = name;
+                Close();
             }
         }
     }

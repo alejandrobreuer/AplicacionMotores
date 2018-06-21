@@ -75,8 +75,14 @@ public class ViewAllQuests : EditorWindow
         {
             AddQuestFinder();
         }
-
-
+        if (createChainQuest != null)
+        {
+            for (int i = 0; i < createChainQuest.allNodes.Count; i++)
+            {
+                allQuestId.Add(createChainQuest.allNodes[i].questID);
+            }
+        }
+        Repaint();
     }
 
     private void QuestFinder()
@@ -293,27 +299,50 @@ public class ViewAllQuests : EditorWindow
                 AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(assetList[i]));
                 assetList.RemoveAt(i);
                 WriteSearch(assetList);
+                if(createChainQuest == wEditChain)
+                {
+                    createChainQuest.Close();
+                }
+                if(wEditSingle != null)
+                {
+                    wEditSingle.Close();
+                }
                 return;
             }
-            if (GUILayout.Button("Edit"))
+            if(createChainQuest == null)
             {
-                if (AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GetAssetPath(assetList[i])) == typeof(SingleQuest))
+                if (GUILayout.Button("Edit"))
                 {
-                    wEditSingle =(CreateSingleQuest)EditorWindow.GetWindow(typeof(CreateSingleQuest));
-                    wEditSingle.wantsMouseMove = true;
-                    wEditSingle.singleQuest = (SingleQuest)AssetDatabase.LoadAssetAtPath(AssetDatabase.GetAssetPath(assetList[i]), typeof(SingleQuest));
-      
-                    wEditSingle.Open();
-
+                    if (AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GetAssetPath(assetList[i])) == typeof(SingleQuest))
+                    {
+                        wEditSingle = (CreateSingleQuest)EditorWindow.GetWindow(typeof(CreateSingleQuest));
+                        wEditSingle.wantsMouseMove = true;
+                        wEditSingle.singleQuest = (SingleQuest)AssetDatabase.LoadAssetAtPath(AssetDatabase.GetAssetPath(assetList[i]), typeof(SingleQuest));
+                        wEditSingle.Open();
+                    }
+                    else if (AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GetAssetPath(assetList[i])) == typeof(ChainQuest))
+                    {
+                        wEditChain = (CreateChainQuest)ScriptableObject.CreateInstance(typeof(CreateChainQuest));
+                        wEditChain.wantsMouseMove = true;
+                        wEditChain.chain = (ChainQuest)AssetDatabase.LoadAssetAtPath(AssetDatabase.GetAssetPath(assetList[i]), typeof(ChainQuest));
+                        wEditChain.StartFunctions(wEditChain);
+                        Close();
+                    }
                 }
-                else if (AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GetAssetPath(assetList[i])) == typeof(ChainQuest))
+            }
+            else
+            {
+
+                if (AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GetAssetPath(assetList[i])) == typeof(ChainQuest) && createChainQuest.chain != (ChainQuest)AssetDatabase.LoadAssetAtPath(AssetDatabase.GetAssetPath(assetList[i]), typeof(ChainQuest)))
                 {
-                    wEditChain = (CreateChainQuest)ScriptableObject.CreateInstance(typeof(CreateChainQuest));
-                    wEditChain.wantsMouseMove = true;
-                    wEditChain.chain = (ChainQuest)AssetDatabase.LoadAssetAtPath(AssetDatabase.GetAssetPath(assetList[i]), typeof(ChainQuest));
-                    wEditChain.StartFunctions(wEditChain);
-
-
+                    if (GUILayout.Button("Edit"))
+                    {
+                        wEditChain = (CreateChainQuest)ScriptableObject.CreateInstance(typeof(CreateChainQuest));
+                        wEditChain.wantsMouseMove = true;
+                        wEditChain.chain = (ChainQuest)AssetDatabase.LoadAssetAtPath(AssetDatabase.GetAssetPath(assetList[i]), typeof(ChainQuest));
+                        wEditChain.StartFunctions(wEditChain);
+                        Close();
+                    }
                 }
             }
             if (addQuest && AssetDatabase.GetMainAssetTypeAtPath(AssetDatabase.GetAssetPath(assetList[i])) == typeof(SingleQuest))
